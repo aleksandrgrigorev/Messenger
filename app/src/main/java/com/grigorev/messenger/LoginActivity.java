@@ -1,12 +1,14 @@
 package com.grigorev.messenger;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -16,16 +18,25 @@ public class LoginActivity extends AppCompatActivity {
     private TextView textViewForgotPassword;
     private TextView textViewRegister;
 
+    private LoginViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         initViews();
+        viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        observeViewModel();
+        setupClickListeners();
+    }
+
+    private void setupClickListeners() {
         buttonLogin.setOnClickListener(view -> {
             String email = editTextEmail.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();
-            //login
+            viewModel.login(email, password);
         });
         textViewForgotPassword.setOnClickListener(view -> {
             Intent intent = ResetPasswordActivity.newIntent(
@@ -37,6 +48,25 @@ public class LoginActivity extends AppCompatActivity {
         textViewRegister.setOnClickListener(view -> {
             Intent intent = RegistrationActivity.newIntent(LoginActivity.this);
             startActivity(intent);
+        });
+    }
+
+    private void observeViewModel() {
+        viewModel.getError().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(
+                        LoginActivity.this,
+                        errorMessage,
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+        viewModel.getUser().observe(this, firebaseUser -> {
+            if (firebaseUser != null) {
+                Intent intent = UsersActivity.newIntent(LoginActivity.this);
+                startActivity(intent);
+                finish();
+            }
         });
     }
 

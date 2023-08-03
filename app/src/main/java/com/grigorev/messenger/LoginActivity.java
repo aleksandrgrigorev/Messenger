@@ -28,10 +28,15 @@ public class LoginActivity extends AppCompatActivity {
             //login
         });
         textViewForgotPassword.setOnClickListener(view -> {
-            // launch forgot password screen intent
+            Intent intent = ResetPasswordActivity.newIntent(
+                    LoginActivity.this,
+                    editTextEmail.getText().toString().trim()
+            );
+            startActivity(intent);
         });
         textViewRegister.setOnClickListener(view -> {
             Intent intent = RegistrationActivity.newIntent(LoginActivity.this);
+            startActivity(intent);
         });
     }
 

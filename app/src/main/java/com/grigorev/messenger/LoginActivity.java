@@ -2,6 +2,7 @@ package com.grigorev.messenger;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
             // launch forgot password screen intent
         });
         textViewRegister.setOnClickListener(view -> {
-            // launch register screen intent
+            Intent intent = RegistrationActivity.newIntent(LoginActivity.this);
         });
     }
 

@@ -9,9 +9,12 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class UsersActivity extends AppCompatActivity {
 
+    private RecyclerView recyclerViewUsers;
+    private UsersAdapter usersAdapter;
     private UsersViewModel usersViewModel;
 
     @Override
@@ -21,6 +24,12 @@ public class UsersActivity extends AppCompatActivity {
 
         usersViewModel = new ViewModelProvider(this).get(UsersViewModel.class);
         observeViewModel();
+    }
+
+    private void initViews() {
+        recyclerViewUsers = findViewById(R.id.recyclerViewUsers);
+        usersAdapter = new UsersAdapter();
+        recyclerViewUsers.setAdapter(usersAdapter);
     }
 
     private void observeViewModel() {

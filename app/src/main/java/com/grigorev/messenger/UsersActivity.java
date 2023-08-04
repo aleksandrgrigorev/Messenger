@@ -15,14 +15,14 @@ public class UsersActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewUsers;
     private UsersAdapter usersAdapter;
-    private UsersViewModel usersViewModel;
+    private UsersViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
-
-        usersViewModel = new ViewModelProvider(this).get(UsersViewModel.class);
+        initViews();
+        viewModel = new ViewModelProvider(this).get(UsersViewModel.class);
         observeViewModel();
     }
 
@@ -33,13 +33,14 @@ public class UsersActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-        usersViewModel.getUser().observe(this, firebaseUser -> {
+        viewModel.getUser().observe(this, firebaseUser -> {
             if (firebaseUser == null) {
                 Intent intent = LoginActivity.newIntent(UsersActivity.this);
                 startActivity(intent);
                 finish();
             }
         });
+        viewModel.getUsers().observe(this, users -> usersAdapter.setUsers(users));
     }
 
     @Override
@@ -51,7 +52,7 @@ public class UsersActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.item_logout) {
-            usersViewModel.logOut();
+            viewModel.logOut();
         }
         return super.onOptionsItemSelected(item);
     }

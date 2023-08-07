@@ -56,7 +56,10 @@ public class RegistrationActivity extends AppCompatActivity {
         });
         viewModel.getUser().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
-                Intent intent = UsersActivity.newIntent(RegistrationActivity.this);
+                Intent intent = UsersActivity.newIntent(
+                        RegistrationActivity.this,
+                        firebaseUser.getUid()
+                );
                 startActivity(intent);
                 finish();
             }

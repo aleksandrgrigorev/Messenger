@@ -5,7 +5,7 @@
     android:id="@+id/recyclerViewUsers"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_light"
+    android:background="#E0F7FA"
     android:padding="8dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     tools:context=".UsersActivity"

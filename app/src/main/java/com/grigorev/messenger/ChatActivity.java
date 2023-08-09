@@ -1,8 +1,5 @@
 package com.grigorev.messenger;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,9 +7,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -30,6 +29,9 @@ public class ChatActivity extends AppCompatActivity {
     private String currentUserId;
     private String otherUserId;
 
+    private ChatViewModel viewModel;
+    private ChatViewModelFactory viewModelFactory;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,26 +39,37 @@ public class ChatActivity extends AppCompatActivity {
         initViews();
         currentUserId = getIntent().getStringExtra(EXTRA_CURRENT_USER_ID);
         otherUserId = getIntent().getStringExtra(EXTRA_OTHER_USER_ID);
+        viewModelFactory = new ChatViewModelFactory(currentUserId, otherUserId);
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(ChatViewModel.class);
         messagesAdapter = new MessagesAdapter(currentUserId);
         recyclerViewMessages.setAdapter(messagesAdapter);
-        List<Message> messages = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        observeViewModel();
+        imageViewSendMessage.setOnClickListener(view -> {
             Message message = new Message(
-                    "Text" + 1,
+                    editTextMessage.getText().toString().trim(),
                     currentUserId,
                     otherUserId
             );
-            messages.add(message);
-        }
-        for (int i = 0; i < 10; i++) {
-            Message message = new Message(
-                    "Text" + 1,
-                    otherUserId,
-                    currentUserId
-            );
-            messages.add(message);
-        }
-        messagesAdapter.setMessages(messages);
+            viewModel.sendMessage(message);
+        });
+    }
+
+    private void observeViewModel() {
+        viewModel.getMessages().observe(this, messages -> messagesAdapter.setMessages(messages));
+        viewModel.getError().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(ChatActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+        viewModel.getMessageSent().observe(this, sent -> {
+            if (sent) {
+                editTextMessage.setText("");
+            }
+        });
+        viewModel.getOtherUser().observe(this, user -> {
+            String userInfo = String.format("%s %s", user.getName(), user.getLastName());
+            textViewTitle.setText(userInfo);
+        });
     }
 
     private void initViews() {

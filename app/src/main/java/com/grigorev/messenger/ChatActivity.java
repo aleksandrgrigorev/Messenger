@@ -2,6 +2,7 @@ package com.grigorev.messenger;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -69,6 +71,14 @@ public class ChatActivity extends AppCompatActivity {
         viewModel.getOtherUser().observe(this, user -> {
             String userInfo = String.format("%s %s", user.getName(), user.getLastName());
             textViewTitle.setText(userInfo);
+            int backgroundResId;
+            if (user.isOnline()) {
+                backgroundResId = R.drawable.circle_green;
+            } else {
+                backgroundResId = R.drawable.circle_red;
+            }
+            Drawable background = ContextCompat.getDrawable(ChatActivity.this, backgroundResId);
+            onlineStatus.setBackground(background);
         });
     }
 
@@ -78,6 +88,18 @@ public class ChatActivity extends AppCompatActivity {
         recyclerViewMessages = findViewById(R.id.recyclerViewMessages);
         editTextMessage = findViewById(R.id.editTextMessage);
         imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.setUserOnline(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        viewModel.setUserOnline(false);
     }
 
     public static Intent newIntent(Context context, String currentUserId, String otherUserId) {
